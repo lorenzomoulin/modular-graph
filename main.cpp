@@ -61,30 +61,6 @@ bool conexo() {
     return true;
 }
 
-bool bipartido_componente(int src, vector<int> &cor) {
-    
-
-    cor[src] = 1;
-    queue<int> q;
-    q.push(src);
-
-    while (!q.empty()) {
-        int u = q.front();
-        q.pop();
- 
-        for (int i = 0; i < lista_adj[u].size(); ++i){
-            int v = lista_adj[u][i].first;
-            if (cor[v] == -1){
-                cor[v] = 1 - cor[u];
-                q.push(v);
-            }
-            else if (cor[v] == cor[u])
-                return false;
-        }
-    }
-    return true;
-}
-
 bool bipartido() {
     vector<int> side(n_vertices, -1);
     bool eh_bipartido = true;
@@ -109,6 +85,31 @@ bool bipartido() {
         }
     }
     return eh_bipartido;
+}
+
+bool euleriano() {
+    if (!conexo()) return false;
+    if (!b_direcionado) {
+        for (int i = 0; i < n_vertices; ++i) {
+            if (lista_adj[i].size() % 2 != 0) return false;
+        }
+        return true;
+    }
+    vector<int> indeg(n_vertices, 0), outdeg(n_vertices, 0);
+    
+    for (int i = 0; i < n_vertices; ++i) {
+        
+        outdeg[i] = lista_adj[i].size();
+        for (int j = 0; j < lista_adj[i].size(); ++j) {
+            int v = lista_adj[i][j].first;
+            indeg[v]++;
+        }
+        
+    }
+    for (int i = 0; i < n_vertices; ++i) {
+        if (indeg[i] != outdeg[i]) return false;
+    }
+    return true;
 }
 
 int main () {
@@ -145,15 +146,20 @@ int main () {
     for (int i = 0; i < n_vertices; ++i) sort(lista_adj[i].begin(), lista_adj[i].end());
     // cout << conexo() << endl;
     for (int i = 0; i < funcoes.size(); ++i) {
+        cout << "f: " <<  funcoes[i] << endl;
         switch (funcoes[i])
         {
-        case 0:
-            cout << conexo() << endl;
-            break;
-        case 1:
-            cout << bipartido() << endl;
-        default:
-            break;
+            case 0:
+                cout << conexo() << endl;
+                break;
+            case 1:
+                cout << bipartido() << endl;
+                break;
+            case 2:
+                cout << euleriano() << endl;
+                break;
+            default:
+                break;
         }
     }
     return 0;
