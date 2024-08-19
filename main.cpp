@@ -13,7 +13,7 @@ using namespace std;
 
 typedef vector<vector<pair<int, int>>> grafo;
 
-grafo lista_adj, grafo_associado;
+grafo lista_adj, grafo_associado, lista_adj_rev;
 
 vector<int> funcoes, visitado;
 
@@ -30,6 +30,7 @@ void leitura_direcionado() {
         lista_adj[a].push_back({b, p});
         grafo_associado[a].push_back({b, p});
         grafo_associado[b].push_back({a, p});
+        lista_adj_rev[b].push_back({a, p});
     } 
 }
 
@@ -162,17 +163,56 @@ bool ciclo() {
     }
     return conta_ciclo > 0; 
 }
-// imprime as componentes conexas separadas por espaco (nao foi especificado como separar as componentes)
-//ordem lexicografica
-void componentes_conexas() {
+// retorna a quantidade de componentes conexas 
+int componentes_conexas() {
+    int qtd = 0;
     for (int i = 0; i < n_vertices; ++i) visitado[i] = 0;
     for (int i = 0; i < n_vertices; ++i) {
         if (!visitado[i]) {
-            dfs(i, true);
+            qtd++;
+            dfs(i, false);
         }
     }
-    cout << endl;
+    return qtd;
 } 
+
+
+int parent = 0, numSCC;
+vector<int>comp, ts;
+
+void revdfs(int u) {
+    vis[u] = true;
+    for(int i = 0, v; i < (int)lista_adj_rev[u].size(); i++) {
+    	v = lista_adj_rev[u][i].first;
+        if(!vis[v]) revdfs(v);
+    }
+    ts.push_back(u);
+}
+
+void dfs(int u) {
+    vis[u] = true; comp[u] = parent;
+    for(int i = 0, v; i < (int)lista_adj[u].size(); i++) {
+    	v = lista_adj[u][i].first;
+        if(!vis[v]) dfs(v);
+    }
+}
+
+void kosaraju() {
+    comp.resize(n_vertices);
+    fill(vis.begin(), vis.end(), 0);
+    for(int i = 0; i < n_vertices; i++)  {
+        if(!vis[i]) revdfs(i);
+    }
+    fill(vis.begin(), vis.end(), 0);
+    numSCC = 0;
+    for(int i = n_vertices-1; i >= 0; i--) {
+        if(!vis[ts[i]]) {
+            parent = ts[i];
+            dfs(ts[i]);
+            numSCC++;
+        }
+    }
+}
 
 
 int main () {
@@ -193,6 +233,7 @@ int main () {
     lista_adj.resize(n_vertices);
     grafo_associado.resize(n_vertices);
     visitado.resize(n_vertices);
+    lista_adj_rev.resize(n_vertices);
 
     //resetando o vetor de vertices visitados
     for (int i = 0; i < n_vertices; ++i) visitado[i] = 0;
@@ -216,20 +257,32 @@ int main () {
         //funcoes indexadas em 1, assim como no PDF
         switch (funcoes[i])
         {
-            case 1:
+            case 0:
                 cout << conexo() << endl;
                 break;
-            case 2:
+            case 1:
                 cout << bipartido() << endl;
                 break;
-            case 3:
+            case 2:
                 cout << euleriano() << endl;
                 break;
-            case 4:
+            case 3:
                 cout << ciclo() << endl;
                 break;
+            case 4:
+                if (b_direcionado) {
+                    cout << -1 << endl;
+                    break;
+                }
+                cout << componentes_conexas() << endl;
+                break;
             case 5:
-                componentes_conexas();
+                if (!b_direcionado) {
+                    cout << -1 << endl;
+                    break; 
+                }
+                kosaraju();
+                cout << numSCC << endl;
                 break;
             default:
                 break;
