@@ -214,6 +214,58 @@ void kosaraju() {
     }
 }
 
+int counter, rootChildren, root, temArticulacao;
+vector<int> num, low, parente, articulationVertex;
+int pontes;
+
+void tarjan(int u) {
+	low[u] = num[u] = counter++;
+	for (int j = 0, v; j < (int)lista_adj[u].size(); j++) {
+		v = lista_adj[u][j].first;
+		if (num[v] == NAO_VISITADO) {
+			parente[v] = u;
+			if (u == root) rootChildren++;
+			tarjan(v);
+			if (low[v] >= num[u]) articulationVertex[u] = true;
+			if (low[v] > num[u]) pontes++;
+			low[u] = min(low[u], low[v]);
+		}
+		else if (v != parente[u])
+			low[u] = min(low[u], num[v]);
+	}
+}
+
+int qtd_articulacoes;
+
+int articulacoes(int print) {
+    counter = 0;
+    qtd_articulacoes = 0;
+    num.resize(n_vertices, NAO_VISITADO);
+    low.resize(n_vertices, 0);
+    parente.resize(n_vertices, 0);
+    articulationVertex.resize(n_vertices, 0);
+    for (int i = 0; i < n_vertices; i++)
+		if (num[i] == NAO_VISITADO) {
+			root = i; rootChildren = 0; tarjan(i);
+			articulationVertex[root] = (rootChildren > 1);
+		}
+    if (print) {
+        for (int i = 0; i < n_vertices; ++i) if (articulationVertex[i]) qtd_articulacoes++;
+        if (qtd_articulacoes) {
+            for (int i = 0; i < n_vertices; ++i) {
+                if (articulationVertex[i]) {
+                    cout << i << ' ';
+                }
+            }
+            cout << endl;
+        }
+        else cout << -1 << endl;
+
+    }
+    return pontes;
+}
+
+
 
 int main () {
 
@@ -283,6 +335,20 @@ int main () {
                 }
                 kosaraju();
                 cout << numSCC << endl;
+                break;
+            case 6:
+                if (b_direcionado) {
+                    cout << -1 << endl;
+                    break;
+                }
+                articulacoes(true);
+                break;
+            case 7:
+                if (b_direcionado) {
+                    cout << -1 << endl;
+                    break;
+                }
+                cout << articulacoes(false) << endl;
                 break;
             default:
                 break;
