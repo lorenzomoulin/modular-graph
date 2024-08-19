@@ -283,12 +283,7 @@ void dfs_tree(int u) {
 
 void arvore_dfs() {
     fill(visitado.begin(), visitado.end(), 0);
-    cout << visitado.size() << endl;
-    for (int i = 0; i < n_vertices; ++i) {
-        if (!visitado[i]) {
-            dfs_tree(i);
-        }
-    }
+    dfs_tree(0);
     cout << endl;
 }
 
