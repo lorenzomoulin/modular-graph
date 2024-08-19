@@ -11,7 +11,8 @@ using namespace std;
 #define DIRECIONADO 1
 #define NAO_DIRECIONADO 0
 
-typedef vector<vector<pair<int, int>>> grafo;
+typedef vector<vector<pair<int, pair<int, int>>>> grafo;
+
 
 grafo lista_adj, grafo_associado, lista_adj_rev;
 
@@ -27,10 +28,10 @@ void leitura_direcionado() {
     for (int i = 0; i < n_arestas; ++i) {
         int id, a, b, p;
         cin >> id >> a >> b >> p;
-        lista_adj[a].push_back({b, p});
-        grafo_associado[a].push_back({b, p});
-        grafo_associado[b].push_back({a, p});
-        lista_adj_rev[b].push_back({a, p});
+        lista_adj[a].push_back({b, {p, id}});
+        grafo_associado[a].push_back({b, {p, id}});
+        grafo_associado[b].push_back({a, {p, id}});
+        lista_adj_rev[b].push_back({a, {p, id}});
     } 
 }
 
@@ -39,24 +40,29 @@ void leitura_nao_direcionado() {
         int id, a, b, p;
         cin >> id >> a >> b >> p;
         // cout << id<< " " << a << " "<< b  << " " << p << endl;
-        lista_adj[a].push_back({b, p});
-        lista_adj[b].push_back({a, p});
-        grafo_associado[a].push_back({b, p});
-        grafo_associado[b].push_back({a, p});
+        lista_adj[a].push_back({b, {p, id}});
+        lista_adj[b].push_back({a, {p, id}});
+        grafo_associado[a].push_back({b, {p, id}});
+        grafo_associado[b].push_back({a, {p, id}});
     } 
 }
 
 void dfs(int u, bool print) {
     visitado[u] = 1;
-    if (print) cout << u << " ";
+    // if (print) cout << u << " ";
     for (auto &v: grafo_associado[u]) {
-        if (!visitado[v.first])
+        if (!visitado[v.first]) {
+            if (print) {
+                cout << v.second.second << " ";
+            } 
             dfs(v.first, print);
+        }
     }
 }
 
 
 bool conexo() {
+    visitado.resize(n_vertices, 0);
     dfs(0, false);
     for (int i = 1; i < n_vertices; ++i) {
         if (!visitado[i]) return false;
@@ -265,7 +271,26 @@ int articulacoes(int print) {
     return pontes;
 }
 
+void dfs_tree(int u) {
+    visitado[u] = 1;
+    for (auto &v: lista_adj[u]) {
+        if (!visitado[v.first]) {
+            cout << v.second.second << " ";
+            dfs_tree(v.first) ;
+        }
+    }
+}
 
+void arvore_dfs() {
+    fill(visitado.begin(), visitado.end(), 0);
+    cout << visitado.size() << endl;
+    for (int i = 0; i < n_vertices; ++i) {
+        if (!visitado[i]) {
+            dfs_tree(i);
+        }
+    }
+    cout << endl;
+}
 
 int main () {
 
@@ -349,6 +374,9 @@ int main () {
                     break;
                 }
                 cout << articulacoes(false) << endl;
+                break;
+            case 8:
+                arvore_dfs();
                 break;
             default:
                 break;
