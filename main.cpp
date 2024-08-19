@@ -253,7 +253,7 @@ int articulacoes(int print) {
     for (int i = 0; i < n_vertices; i++)
 		if (num[i] == NAO_VISITADO) {
 			root = i; rootChildren = 0; tarjan(i);
-			articulationVertex[root] = (rootChildren > 1);
+			articulationVertex[root] = (rootChildren >= 1);
 		}
     if (print) {
         for (int i = 0; i < n_vertices; ++i) if (articulationVertex[i]) qtd_articulacoes++;
@@ -286,6 +286,31 @@ void arvore_dfs() {
     dfs_tree(0);
     cout << endl;
 }
+
+void bfs_tree() {
+    vector<int> visitado(n_vertices, -1);
+    queue<int> q;
+    int src = 0;
+    q.push(src);
+    visitado[src] = 0;
+    //BFS
+    while (!q.empty()) {
+        int v = q.front();
+        q.pop();
+        for (auto p : lista_adj[v]) {
+            int u = p.first;
+            if (visitado[u] == -1) {
+                visitado[u] = visitado[v] + 1;
+                cout << p.second.second << " ";
+                q.push(u);
+            } 
+        }
+    }
+    cout << endl;
+    
+}
+
+
 
 int main () {
 
@@ -361,6 +386,7 @@ int main () {
                     cout << -1 << endl;
                     break;
                 }
+                // find_cutpoints();
                 articulacoes(true);
                 break;
             case 7:
@@ -372,6 +398,9 @@ int main () {
                 break;
             case 8:
                 arvore_dfs();
+                break;
+            case 9:
+                bfs_tree();
                 break;
             default:
                 break;
