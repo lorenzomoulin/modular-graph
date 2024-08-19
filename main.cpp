@@ -112,6 +112,41 @@ bool euleriano() {
     return true;
 }
 
+int conta_ciclo;
+
+#define NAO_VISITADO -1
+#define EXPLORADO -2
+#define VISITADO -3
+
+vector<int> vis, pai;
+
+void dfs_cycle(int u, int chamou) { // DFS for checking graph edge properties
+	vis[u] = EXPLORADO;
+	for (int j = 0, v; j < (int)lista_adj[u].size(); j++) {
+		v = lista_adj[u][j].first;
+        if (v == chamou) continue;
+		if (vis[v] == NAO_VISITADO) { // EXPLORADO->NAO_VISITADO
+			pai[v] = u; 
+			dfs_cycle(v, u);
+		}
+		else if (vis[v] == EXPLORADO) {
+			conta_ciclo++;
+		}
+	}
+	vis[u] = VISITADO; 
+}
+
+bool ciclo() {
+    vis.resize(n_vertices, NAO_VISITADO);
+    pai.resize(n_vertices);
+    for (int i = 0; i < n_vertices; ++i) {
+        if (vis[i] == NAO_VISITADO) {
+            dfs_cycle(i, i);
+        }
+    }
+    return conta_ciclo > 0;
+}
+
 int main () {
     string the_string;
     getline(cin, the_string);
@@ -157,6 +192,9 @@ int main () {
                 break;
             case 2:
                 cout << euleriano() << endl;
+                break;
+            case 3:
+                cout << ciclo() << endl;
                 break;
             default:
                 break;
