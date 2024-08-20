@@ -5,6 +5,7 @@
 #include <sstream>
 #include <algorithm>
 #include <queue>
+#include <set>
 
 using namespace std;
 
@@ -380,6 +381,28 @@ void topologicalsort() {
     cout << endl;
 }
 
+#define INF 0x3f3f3f3f
+
+int dijkstra(int s, int t) {
+    vector<int> dist(n_vertices, INF);
+	set<ii> pq;
+	dist[s] = 0;
+	pq.insert(ii(0, s));
+	while(!pq.empty()) {
+		int u = pq.begin()->second;
+		pq.erase(pq.begin());
+		for(int i=0; i<(int)lista_adj[u].size(); i++) {
+			int v = lista_adj[u][i].first;
+			int w = lista_adj[u][i].second.first;
+			if (dist[v] > dist[u] + w) {
+				pq.erase(ii(dist[v], v));
+				dist[v] = dist[u] + w;
+				pq.insert(ii(dist[v], v));
+			}
+		}
+	}
+	return dist[t];
+}
 
 int main () {
 
@@ -483,6 +506,13 @@ int main () {
                     break;
                 }
                 topologicalsort();
+            case 12:
+                if (b_direcionado) {
+                    cout << -1 << endl;
+                    break;
+                }
+                cout << dijkstra(0, n_vertices-1) << endl;
+                break;
             default:
                 break;
         }
