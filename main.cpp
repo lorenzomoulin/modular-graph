@@ -358,6 +358,29 @@ ll kruskal() {
 	return cost;
 }
 
+vector<int> toposort;	//Ordem reversa!
+
+void topo(int u) {
+	vis[u] = true;
+	for (int j = 0, v; j < (int)lista_adj[u].size(); j++) {
+		v = lista_adj[u][j].first;
+		if (!vis[v]) topo(v);
+	}
+	toposort.push_back(u);
+    cout << u << " "; 
+}
+
+void topologicalsort() {
+    vis.assign(n_vertices, 0);
+    for (int i = 0; i < n_vertices; ++i) {
+        if (!vis[i]) {
+            topo(i);
+        }
+    }
+    cout << endl;
+}
+
+
 int main () {
 
     //leitura das funcoes a serem testadas
@@ -454,7 +477,12 @@ int main () {
                 }
                 cout << kruskal () << endl;
                 break;
-
+            case 11:
+                if (!b_direcionado || ciclo()) {
+                    cout << -1 << endl;
+                    break;
+                }
+                topologicalsort();
             default:
                 break;
         }
