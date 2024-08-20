@@ -55,7 +55,7 @@ void dfs(int u, bool print) {
     for (auto &v: grafo_associado[u]) {
         if (!visitado[v.first]) {
             if (print) {
-                cout << v.second.second << " ";
+                cout << v.first << " ";
             } 
             dfs(v.first, print);
         }
@@ -404,6 +404,69 @@ int dijkstra(int s, int t) {
 	return dist[t];
 }
 
+
+// vector<int> adjU[MAXN];
+// int pairU[MAXN], pairV[MAXN], dist[MAXN];
+// int m, n;
+// //Vertices enumerados de 1 a m em U e de 1 a n em V!!!!
+
+// bool bfs() {
+// 	queue<int> q;
+// 	for (int u = 1; u <= m; u++) {
+// 		if (pairU[u] == 0) {
+// 			dist[u] = 0; q.push(u);
+// 		}
+// 		else dist[u] = INF;
+// 	}
+// 	dist[0] = INF;
+// 	while (!q.empty()) {
+// 		int u = q.front(); q.pop();
+// 		if (dist[u] >= dist[0]) continue;
+// 		for (int i = 0; i < (int)adjU[u].size(); i++) {
+// 			int v = adjU[u][i];
+// 			if (dist[pairV[v]] == INF) {
+// 				dist[pairV[v]] = dist[u] + 1;
+// 				q.push(pairV[v]);
+// 			}
+// 		}
+// 	}
+// 	return (dist[0] != INF);
+// }
+
+// bool dfs_flow(int u) {
+// 	if (u == 0) return true;
+// 	for (int i = 0; i < (int)adjU[u].size(); i++) {
+// 		int v = adjU[u][i];
+// 		if (dist[pairV[v]] == dist[u]+1) {
+// 			if (dfs_flow(pairV[v])) {
+// 				pairV[v] = u; pairU[u] = v;
+// 				return true;
+// 			}
+// 		}
+// 	}
+// 	dist[u] = INF;
+// 	return false;
+// }
+
+// int hopcroftKarp() {
+// 	memset(&pairU, 0, sizeof pairU);
+// 	memset(&pairV, 0, sizeof pairV);
+// 	int result = 0;
+// 	while (bfs()) {
+// 		for (int u=1; u<=m; u++) {
+// 			if (pairU[u]==0 && dfs(u))
+// 				result++;
+// 		}
+// 	}
+// 	return result;
+// }
+
+void fecho() {
+    visitado.assign(n_vertices, 0);
+    dfs(0, true);
+    cout << endl;
+}
+
 int main () {
 
     //leitura das funcoes a serem testadas
@@ -512,6 +575,12 @@ int main () {
                     break;
                 }
                 cout << dijkstra(0, n_vertices-1) << endl;
+                break;
+            case 13:
+                cout << -1 << endl;
+                break;
+            case 14:
+                fecho();
                 break;
             default:
                 break;
