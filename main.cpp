@@ -16,6 +16,8 @@ typedef vector<vector<pair<int, pair<int, int>>>> grafo;
 
 grafo lista_adj, grafo_associado, lista_adj_rev;
 
+vector< pair<long long, pair<int, int>> > edgeList;
+
 vector<int> funcoes, visitado;
 
 int n_arestas, n_vertices;
@@ -39,17 +41,16 @@ void leitura_nao_direcionado() {
     for (int i = 0; i < n_arestas; ++i) {
         int id, a, b, p;
         cin >> id >> a >> b >> p;
-        // cout << id<< " " << a << " "<< b  << " " << p << endl;
         lista_adj[a].push_back({b, {p, id}});
         lista_adj[b].push_back({a, {p, id}});
         grafo_associado[a].push_back({b, {p, id}});
         grafo_associado[b].push_back({a, {p, id}});
+        edgeList.push_back(make_pair(p, pair<int, int>(a, b)));
     } 
 }
 
 void dfs(int u, bool print) {
     visitado[u] = 1;
-    // if (print) cout << u << " ";
     for (auto &v: grafo_associado[u]) {
         if (!visitado[v.first]) {
             if (print) {
@@ -205,6 +206,7 @@ void dfs(int u) {
 
 void kosaraju() {
     comp.resize(n_vertices);
+    vis.resize(n_vertices);
     fill(vis.begin(), vis.end(), 0);
     for(int i = 0; i < n_vertices; i++)  {
         if(!vis[i]) revdfs(i);
@@ -310,7 +312,51 @@ void bfs_tree() {
     
 }
 
+class UnionFind {
+private:
+	vector<int> parent, rank;
+public:
+	UnionFind(int N) {
+		rank.assign(N+9, 0);
+		parent.assign(N+9, 0);
+		for (int i = 0; i < N; i++) parent[i] = i;
+	}
+	int find(int i) {
+		while(i != parent[i]) i = parent[i];
+		return i;
+	}
+	bool isSameSet(int i, int j) {
+		return find(i) == find(j);
+	}
+	void unionSet (int i, int j) {
+		if (isSameSet(i, j)) return;
+		int x = find(i), y = find(j);
+		if (rank[x] > rank[y]) parent[y] = x;
+		else {
+			parent[x] = y;
+			if (rank[x] == rank[y]) rank[y]++;
+		}
+	}
+};
 
+typedef pair<int, int> ii;
+typedef long long ll;
+
+
+ll kruskal() {
+	ll cost = 0;
+	UnionFind UF(n_vertices);
+	pair<int, ii> edge;
+	sort(edgeList.begin(), edgeList.end());
+	for (int i = 0; i < n_arestas; i++) {
+		edge = edgeList[i];
+		if (!UF.isSameSet(edge.second.first, edge.second.second)) { 
+			cost += edge.first;
+			UF.unionSet(edge.second.first, edge.second.second);
+		}
+	}
+	return cost;
+}
 
 int main () {
 
@@ -386,7 +432,6 @@ int main () {
                     cout << -1 << endl;
                     break;
                 }
-                // find_cutpoints();
                 articulacoes(true);
                 break;
             case 7:
@@ -402,6 +447,14 @@ int main () {
             case 9:
                 bfs_tree();
                 break;
+            case 10:
+                if (b_direcionado || !conexo()) {
+                    cout << -1 << endl;
+                    break;
+                }
+                cout << kruskal () << endl;
+                break;
+
             default:
                 break;
         }
